@@ -4,19 +4,19 @@
 * Description: This file contains function definitions for DMA operation.
 *
 *******************************************************************************
-* Copyright (2018-2019), Cypress Semiconductor Corporation. All rights reserved.
+* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
 *******************************************************************************
 * This software, including source code, documentation and related materials
-* (“Software”), is owned by Cypress Semiconductor Corporation or one of its
-* subsidiaries (“Cypress”) and is protected by and subject to worldwide patent
+* ("Software"), is owned by Cypress Semiconductor Corporation or one of its
+* subsidiaries ("Cypress") and is protected by and subject to worldwide patent
 * protection (United States and foreign), United States copyright laws and
 * international treaty provisions. Therefore, you may use this Software only
 * as provided in the license agreement accompanying the software package from
-* which you obtained this Software (“EULA”).
+* which you obtained this Software ("EULA").
 *
-* If no EULA applies, Cypress hereby grants you a personal, nonexclusive,
+* If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software source
-* code solely for use in connection with Cypress’s integrated circuit products.
+* code solely for use in connection with Cypress's integrated circuit products.
 * Any reproduction, modification, translation, compilation, or representation
 * of this Software except as specified above is prohibited without the express
 * written permission of Cypress.
@@ -29,8 +29,8 @@
 * Software or any product or circuit described in the Software. Cypress does
 * not authorize its products for use in any products where a malfunction or
 * failure of the Cypress product may reasonably be expected to result in
-* significant property damage, injury or death (“High Risk Product”). By
-* including Cypress’s product in a High Risk Product, the manufacturer of such
+* significant property damage, injury or death ("High Risk Product"). By
+* including Cypress's product in a High Risk Product, the manufacturer of such
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
@@ -38,11 +38,11 @@
 
 #include "Interface.h"
 
-volatile uint32_t txDmaDone=0;
+volatile uint32_t tx_dma_done=0;
 
 void handle_error(void);
 
-uint32_t ConfigureTxDma(uint32_t* txBuffer)
+uint32_t configure_tx_dma(uint32_t* tx_buffer)
  {
      cy_en_dma_status_t dma_init_status;
      const cy_stc_sysint_t intTxDma_cfg =
@@ -52,23 +52,23 @@ uint32_t ConfigureTxDma(uint32_t* txBuffer)
      };
      /* Initialize descriptor */
      dma_init_status = Cy_DMA_Descriptor_Init(&txDma_Descriptor_0, &txDma_Descriptor_0_config);
-     if(dma_init_status!=CY_DMA_SUCCESS)
+     if (dma_init_status!=CY_DMA_SUCCESS)
      {
          return INIT_FAILURE;
      }
 
      dma_init_status = Cy_DMA_Channel_Init(txDma_HW, txDma_CHANNEL, &txDma_channelConfig);
-     if(dma_init_status!=CY_DMA_SUCCESS)
+     if (dma_init_status!=CY_DMA_SUCCESS)
      {
-    	 return INIT_FAILURE;
+         return INIT_FAILURE;
      }
 
      /* Set source and destination for descriptor 1 */
-     Cy_DMA_Descriptor_SetSrcAddress(&txDma_Descriptor_0, (uint8_t *)txBuffer);
+     Cy_DMA_Descriptor_SetSrcAddress(&txDma_Descriptor_0, (uint8_t *)tx_buffer);
      Cy_DMA_Descriptor_SetDstAddress(&txDma_Descriptor_0, (void *)&mSPI_HW->TX_FIFO_WR);
 
       /* Initialize and enable the interrupt from TxDma */
-     Cy_SysInt_Init(&intTxDma_cfg, &TxDmaComplete);
+     Cy_SysInt_Init(&intTxDma_cfg, &tx_dma_complete);
      NVIC_EnableIRQ((IRQn_Type)intTxDma_cfg.intrSrc);
 
       /* Enable DMA interrupt source. */
@@ -78,7 +78,7 @@ uint32_t ConfigureTxDma(uint32_t* txBuffer)
      return INIT_SUCCESS;
  }
 
-void TxDmaComplete(void)
+void tx_dma_complete(void)
  {
      /* Check tx DMA status */
      if ((CY_DMA_INTR_CAUSE_COMPLETION    != Cy_DMA_Channel_GetStatus(txDma_HW, txDma_CHANNEL)) &&
@@ -87,7 +87,7 @@ void TxDmaComplete(void)
          /* DMA error occurred while TX operations */
          handle_error();
      }
-     txDmaDone=1;
+     tx_dma_done=1;
      /* Clear tx DMA interrupt */
      Cy_DMA_Channel_ClearInterrupt(txDma_HW, txDma_CHANNEL);
 

@@ -1,22 +1,22 @@
 /******************************************************************************
 * File Name: SPIMaster.c
 *
-* Description: 	This file contains function definitions for SPI Master.
+* Description:  This file contains function definitions for SPI Master.
 *
 *******************************************************************************
-* Copyright (2018-2019), Cypress Semiconductor Corporation. All rights reserved.
+* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
 *******************************************************************************
 * This software, including source code, documentation and related materials
-* (“Software”), is owned by Cypress Semiconductor Corporation or one of its
-* subsidiaries (“Cypress”) and is protected by and subject to worldwide patent
+* ("Software"), is owned by Cypress Semiconductor Corporation or one of its
+* subsidiaries ("Cypress") and is protected by and subject to worldwide patent
 * protection (United States and foreign), United States copyright laws and
 * international treaty provisions. Therefore, you may use this Software only
 * as provided in the license agreement accompanying the software package from
-* which you obtained this Software (“EULA”).
+* which you obtained this Software ("EULA").
 *
-* If no EULA applies, Cypress hereby grants you a personal, nonexclusive,
+* If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software source
-* code solely for use in connection with Cypress’s integrated circuit products.
+* code solely for use in connection with Cypress's integrated circuit products.
 * Any reproduction, modification, translation, compilation, or representation
 * of this Software except as specified above is prohibited without the express
 * written permission of Cypress.
@@ -29,8 +29,8 @@
 * Software or any product or circuit described in the Software. Cypress does
 * not authorize its products for use in any products where a malfunction or
 * failure of the Cypress product may reasonably be expected to result in
-* significant property damage, injury or death (“High Risk Product”). By
-* including Cypress’s product in a High Risk Product, the manufacturer of such
+* significant property damage, injury or death ("High Risk Product"). By
+* including Cypress's product in a High Risk Product, the manufacturer of such
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
@@ -38,99 +38,99 @@
 
 #include "Interface.h"
 
-extern volatile uint32_t txDmaDone;
+extern volatile uint32_t tx_dma_done;
 /******************************************************************************
-* Function Name: initMaster
+* Function Name: init_master
 *******************************************************************************
 *
-* Summary: 		This function initializes the SPI Master based on the
-* 				configuration done in design.modus file.
+* Summary:      This function initializes the SPI Master based on the
+*               configuration done in design.modus file.
 *
-* Parameters: 	None
+* Parameters:   None
 *
-* Return:		(uint32) INIT_SUCCESS or INIT_FAILURE
+* Return:       (uint32) INIT_SUCCESS or INIT_FAILURE
 *
 ******************************************************************************/
-uint32 initMaster(void)
+uint32 init_master(void)
 {
-    cy_en_scb_spi_status_t initStatus;
+    cy_en_scb_spi_status_t init_status;
 
-	/* Configure SPI block */
-	initStatus = Cy_SCB_SPI_Init(mSPI_HW, &mSPI_config, NULL);
+    /* Configure SPI block */
+    init_status = Cy_SCB_SPI_Init(mSPI_HW, &mSPI_config, NULL);
 
-	/* If the initialization fails, return failure status */
-	if(initStatus != CY_SCB_SPI_SUCCESS)
-	{
-		return(INIT_FAILURE);
-	}
+    /* If the initialization fails, return failure status */
+    if (init_status != CY_SCB_SPI_SUCCESS)
+    {
+        return(INIT_FAILURE);
+    }
 
-	/* Set active slave select to line 0 */
-	Cy_SCB_SPI_SetActiveSlaveSelect(mSPI_HW, CY_SCB_SPI_SLAVE_SELECT1);
+    /* Set active slave select to line 0 */
+    Cy_SCB_SPI_SetActiveSlaveSelect(mSPI_HW, CY_SCB_SPI_SLAVE_SELECT1);
 
-	/* Enable SPI master block. */
-	Cy_SCB_SPI_Enable(mSPI_HW);
+    /* Enable SPI master block. */
+    Cy_SCB_SPI_Enable(mSPI_HW);
 
-	/* Initialization completed */
+    /* Initialization completed */
 
-	return(INIT_SUCCESS);
+    return(INIT_SUCCESS);
 }
 
 
 /******************************************************************************
-* Function Name: sendPacket
+* Function Name: send_packet
 *******************************************************************************
 *
-* Summary: 		This function sends the data to the slave. Note that the below
-* 				function is blocking until all the bytes are transferred.
+* Summary:      This function sends the data to the slave. Note that the below
+*               function is blocking until all the bytes are transferred.
 *
-* Parameters:  	None
+* Parameters:   None
 *
-* Return:		None
+* Return:       None
 *
 ******************************************************************************/
-void sendPacket(void)
+void send_packet(void)
 {
-	/* Enable DMA channel to transfer 12 bytes of data from txBuffer into mSPI TX-FIFO */
-	Cy_DMA_Channel_Enable(txDma_HW, txDma_CHANNEL);
+    /* Enable DMA channel to transfer 12 bytes of data from txBuffer into mSPI TX-FIFO */
+    Cy_DMA_Channel_Enable(txDma_HW, txDma_CHANNEL);
 }
 
 /******************************************************************************
-* Function Name: checkTranferStatus
+* Function Name: check_tranfer_status
 *******************************************************************************
 *
-* Summary: 		This function checks for master transfer completion status
+* Summary:      This function checks for master transfer completion status
 *
-* Parameters:  	None
+* Parameters:   None
 *
-* Return:		Status of transfer completion
+* Return:       Status of transfer completion
 *
 ******************************************************************************/
-uint32 checkTranferStatus(void)
+uint32 check_tranfer_status(void)
 {
-	volatile uint32 masterStatus;
-	uint32 transferStatus;
+    volatile uint32 master_status;
+    uint32 transfer_status;
     /* Wait until master complete the transfer */
-	do
-	{
-		masterStatus  = Cy_SCB_SPI_GetSlaveMasterStatus(mSPI_HW);
+    do
+    {
+        master_status  = Cy_SCB_SPI_GetSlaveMasterStatus(mSPI_HW);
 
-	} while ((0UL == (masterStatus & (CY_SCB_SPI_MASTER_DONE | CY_SCB_SPI_SLAVE_ERR))) || txDmaDone == 0);
+    } while ((0UL == (master_status & (CY_SCB_SPI_MASTER_DONE | CY_SCB_SPI_SLAVE_ERR))) || tx_dma_done == 0);
 
-    txDmaDone = 0;
-	/* Check for any errors */
-	if(CY_SCB_SPI_MASTER_DONE & masterStatus)
-	{
-		/* No error */
-		transferStatus = TRANSFER_COMPLETE;
-	}
-	else
-	{
-		/* Error encountered in the transfer */
-		transferStatus = TRANSFER_FAILURE;
-	}
-	/* Clear the SPI master status */
-	Cy_SCB_SPI_ClearSlaveMasterStatus(mSPI_HW, masterStatus);
+    tx_dma_done = 0;
+    /* Check for any errors */
+    if (CY_SCB_SPI_MASTER_DONE & master_status)
+    {
+        /* No error */
+        transfer_status = TRANSFER_COMPLETE;
+    }
+    else
+    {
+        /* Error encountered in the transfer */
+        transfer_status = TRANSFER_FAILURE;
+    }
+    /* Clear the SPI master status */
+    Cy_SCB_SPI_ClearSlaveMasterStatus(mSPI_HW, master_status);
 
-	return(transferStatus);
+    return(transfer_status);
 }
 
