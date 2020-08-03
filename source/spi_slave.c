@@ -1,5 +1,5 @@
 /******************************************************************************
-* File Name: SPISlave.c
+* File Name: spi_slave.c
 *
 * Description: This file contains function definitions for SPI Slave.
 *
@@ -34,9 +34,14 @@
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
-#include "SPISlave.h"
 
-#include "Interface.h"
+#include "spi_slave.h"
+#include "interface.h"
+#include "spi_dma.h"
+
+
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
+
 
 /******************************************************************************
 * Function Name: init_slave
@@ -71,52 +76,28 @@ uint32 init_slave(void)
     Cy_SCB_SPI_Enable(sSPI_HW);
 
     /* Initialization completed */
-
     return(INIT_SUCCESS);
 }
 
 
 /******************************************************************************
-* Function Name: read_packet
+* Function Name: receive_packet
 *******************************************************************************
 *
-* Summary:      This function reads the data received by the slave. Note that
-*               the below function is blocking until the required number of
-*               bytes is received by the slave.
+* Summary:      This function transfers data from sSPI RX-FIFO to rxBuffer. The 
+*               below function enables channel and DMA block to start descriptor 
+*               execution process for rxDMA.
 *
-* Parameters:   (uint32 *) rx_buffer - Pointer to the receive buffer where data
-*               needs to be stored
-*               (uint32)     transfer_size - Number of bytes to be received
+* Parameters:   None
 *
 * Return:       None
 *
 ******************************************************************************/
-uint32 read_packet(uint32 *rx_buffer, uint32 transfer_size)
+void receive_packet(void)
 {
-    uint32 slave_status;
-
-    /* Wait till all the bytes are received */
-    while(Cy_SCB_SPI_GetNumInRxFifo(sSPI_HW) != transfer_size)
-    {
-
-    }
-
-    /* Read RX FIFO */
-    Cy_SCB_SPI_ReadArray(sSPI_HW, rx_buffer, transfer_size);
-
-    /* Check start and end of packet markers */
-    if ((rx_buffer[PACKET_SOP_POS] == PACKET_SOP) && (rx_buffer[PACKET_EOP_POS] == PACKET_EOP))
-    {
-        /* Data received correctly */
-        slave_status = TRANSFER_COMPLETE;
-    }
-    else
-    {
-        /* Data was not received correctly */
-        slave_status = TRANSFER_FAILURE;
-    }
-
-    return slave_status;
+    /* Enable DMA channel to transfer 12 bytes of data from sSPI RX-FIFO to rxBuffer. */
+    Cy_DMA_Channel_Enable(rxDma_HW, rxDma_CHANNEL);
 }
 
 
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE)) */

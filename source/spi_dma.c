@@ -1,5 +1,5 @@
 /******************************************************************************
-* File Name: SpiDma.c
+* File Name: spi_dma.c
 *
 * Description: This file contains function definitions for DMA operation.
 *
@@ -34,13 +34,22 @@
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
-#include "SpiDma.h"
 
-#include "Interface.h"
+#include "spi_dma.h"
+#include "interface.h"
 
-volatile uint32_t tx_dma_done=0;
 
-void handle_error(void);
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
+
+volatile bool rx_dma_done = false;
+
+#endif
+
+
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
+
+volatile bool tx_dma_done = false;
+
 
 uint32_t configure_tx_dma(uint32_t* tx_buffer)
  {
@@ -73,10 +82,11 @@ uint32_t configure_tx_dma(uint32_t* tx_buffer)
 
       /* Enable DMA interrupt source. */
      Cy_DMA_Channel_SetInterruptMask(txDma_HW, txDma_CHANNEL, CY_DMA_INTR_MASK);
-
+     /* Enable DMA block to start descriptor execution process */
      Cy_DMA_Enable(txDma_HW);
      return INIT_SUCCESS;
  }
+
 
 void tx_dma_complete(void)
  {
@@ -87,10 +97,76 @@ void tx_dma_complete(void)
          /* DMA error occurred while TX operations */
          handle_error();
      }
-     tx_dma_done=1;
+
+     tx_dma_done = true;
      /* Clear tx DMA interrupt */
      Cy_DMA_Channel_ClearInterrupt(txDma_HW, txDma_CHANNEL);
+ }
 
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER)) */
+
+
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
+
+uint32_t configure_rx_dma(uint32_t* rx_buffer)
+ {
+     cy_en_dma_status_t dma_init_status;
+     const cy_stc_sysint_t intRxDma_cfg =
+     {
+         .intrSrc      = rxDma_IRQ,
+         .intrPriority = 7u
+     };
+     /* Initialize descriptor */
+     dma_init_status = Cy_DMA_Descriptor_Init(&rxDma_Descriptor_0, &rxDma_Descriptor_0_config);
+     if (dma_init_status!=CY_DMA_SUCCESS)
+     {
+         return INIT_FAILURE;
+     }
+
+     dma_init_status = Cy_DMA_Channel_Init(rxDma_HW, rxDma_CHANNEL, &rxDma_channelConfig);
+     if (dma_init_status!=CY_DMA_SUCCESS)
+     {
+         return INIT_FAILURE;
+     }
+
+     /* Set source and destination for descriptor 1 */
+     Cy_DMA_Descriptor_SetSrcAddress(&rxDma_Descriptor_0, (void *)&sSPI_HW->RX_FIFO_RD);
+     Cy_DMA_Descriptor_SetDstAddress(&rxDma_Descriptor_0, (uint8_t *)rx_buffer);
+
+      /* Initialize and enable the interrupt from TxDma */
+     Cy_SysInt_Init(&intRxDma_cfg, &rx_dma_complete);
+     NVIC_EnableIRQ((IRQn_Type)intRxDma_cfg.intrSrc);
+
+      /* Enable DMA interrupt source. */
+     Cy_DMA_Channel_SetInterruptMask(rxDma_HW, rxDma_CHANNEL, CY_DMA_INTR_MASK);
+     /* Enable channel and DMA block to start descriptor execution process */
+     Cy_DMA_Channel_Enable(rxDma_HW, rxDma_CHANNEL);
+     Cy_DMA_Enable(rxDma_HW);
+     return INIT_SUCCESS;
  }
 
 
+void rx_dma_complete(void)
+{
+    /* Scenario: Inside the interrupt service routine for block DW0 channel 23: */
+    if (CY_DMA_INTR_MASK == Cy_DMA_Channel_GetInterruptStatusMasked(rxDma_HW, rxDma_CHANNEL))
+    {
+        /* Get the interrupt cause */
+        cy_en_dma_intr_cause_t cause = Cy_DMA_Channel_GetStatus(rxDma_HW, rxDma_CHANNEL);
+        if (CY_DMA_INTR_CAUSE_COMPLETION != cause)
+        {
+            /* DMA error occurred while RX operations */
+            handle_error();
+        }
+        else
+        {
+            rx_dma_done = true;
+        }
+
+        /* Clear the interrupt */
+        Cy_DMA_Channel_ClearInterrupt(rxDma_HW, rxDma_CHANNEL);
+    }
+
+}
+
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE)) */

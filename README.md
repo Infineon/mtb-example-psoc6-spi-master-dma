@@ -1,6 +1,6 @@
 # PSoC 6 MCU: SCB SPI Master with DMA
 
-This example demonstrates the use of SPI SCB (Serial Communication Block) resource for PSoC® 6 MCU in Master mode using DMA. The SPI master is configured to send command packets to control a user LED on the slave. Both the slave and master are on the same device.
+This example demonstrates the use of SPI Serial Communication Block (SCB)) resource for PSoC® 6 MCU in master mode using DMA. The SPI master is configured to send command packets to control a user LED on the slave. Both the master and slave can be on the same device or on different devices.
 
 ## Requirements
 
@@ -11,27 +11,27 @@ This example demonstrates the use of SPI SCB (Serial Communication Block) resour
 ## Supported Kits
 
 - [PSoC 6 Wi-Fi BT Prototyping Kit](https://www.cypress.com/CY8CPROTO-062-4343W) (CY8CPROTO-062-4343W) - Default target
-- [PSoC 6 WiFi-BT Pioneer Kit](https://www.cypress.com/CY8CKIT-062-WIFI-BT) (CY8CKIT-062-WIFI-BT)
+- [PSoC 6 WiFi-BT Pioneer Kit](https://www.cypress.com/CY8CKIT-062-WiFi-BT) (CY8CKIT-062-WIFI-BT)
 - [PSoC 6 BLE Pioneer Kit](https://www.cypress.com/CY8CKIT-062-BLE) (CY8CKIT-062-BLE)
 - [PSoC 6 BLE Prototyping Kit](https://www.cypress.com/CY8CPROTO-063-BLE) (CY8CPROTO-063-BLE)
 - [PSoC 62S2 Wi-Fi BT Pioneer Kit](https://www.cypress.com/CY8CKIT-062S2-43012) (CY8CKIT-062S2-43012)
 - [PSoC 62S1 Wi-Fi BT Pioneer Kit](https://www.cypress.com/CYW9P62S1-43438EVB-01) (CYW9P62S1-43438EVB-01)
+- [PSoC 62S1 Wi-Fi BT Pioneer Kit](https://www.cypress.com/CYW9P62S1-43012EVB-01) (CYW9P62S1-43012EVB-01)
+- [PSoC 62S3 Wi-Fi BT Prototyping Kit](https://www.cypress.com/CY8CPROTO-062S3-4343W) (CY8CPROTO-062S3-4343W)
 
 ## Hardware Setup
 
 This example uses the board's default configuration. See the kit user guide to ensure that the board is configured correctly.
 
-**Note**: The PSoC 6 BLE Pioneer Kit and the PSoC 6 WiFi-BT Pioneer Kit ship with KitProg2 installed. ModusToolbox software requires KitProg3. Before using this code example, make sure that the board is upgraded to KitProg3. The tool and instructions are available in the [Firmware Loader](https://github.com/cypresssemiconductorco/Firmware-loader) GitHub repository. If you do not upgrade, you will see an error like "unable to find CMSIS-DAP device" or "KitProg firmware is out of date".
+**Note**: The PSoC 6 BLE Pioneer Kit (CY8CKIT-062-BLE) and the PSoC 6 WiFi-BT Pioneer Kit (CY8CKIT-062-WIFI-BT) ship with KitProg2 installed. ModusToolbox software requires KitProg3. Before using this code example, make sure that the board is upgraded to KitProg3. The tool and instructions are available in the [Firmware Loader](https://github.com/cypresssemiconductorco/Firmware-loader) GitHub repository. If you do not upgrade, you will see an error like "unable to find CMSIS-DAP device" or "KitProg firmware is out of date".
 
 Use jumper wires to establish a connection between the master and slave on the kit. For the default kit, do the following on the board (Verify with the corresponding custom *design.modus* to find the respective SPI pins for other kits).
 1. Connect P6[0] to P9[0].  
 2. Connect P6[1] to P9[1].  
 3. Connect P6[2] to P9[2].  
-4. Connect P6[3] to P9[4]. 
+4. Connect P6[3] to P9[3]. 
 
 ## Software Setup
-
-Install a terminal emulator if you don't have one. Instructions in this document use [Tera Term](https://ttssh2.osdn.jp/index.html.en).
 
 This example requires no additional software or tools.
 
@@ -43,17 +43,19 @@ This example requires no additional software or tools.
 
 2. Pick a kit supported by the code example from the list shown in the **Project Creator - Choose Board Support Package (BSP)** dialog.
 
-   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the **Library Manager** to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. To access the Library Manager, right-click the application name from the Project Workspace window in the IDE, and select **ModusToolbox** > **Library Manager**.
+   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the **Library Manager** to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. 
+   
+   To access the Library Manager, right-click the application name from the Project Workspace window in the IDE, and select **ModusToolbox** > **Library Manager**. You can also access it from the **Quick Panel**.
 
    You can also just start the application creation process again and select a different kit.
 
-   If you want to use the application for a kit not listed here, you may need to update source files. If the kit does not have the required resources, the application may not work.
+   If you want to use the application for a kit not listed here, you may need to update the source files. If the kit does not have the required resources, the application may not work.
 
-3. In the **Project Creator - Choose Board Support Package (BSP)** dialog, choose the example.
+3. In the **Project Creator - Select Application** dialog, choose the example.
 
-4. Optionally, update the **Application Name:** and **Location** fields with the application name and local path where application is created.
+4. Optionally, update the **Application Name** and **Location** fields with the application name and local path where the application is created.
 
-5. Click **Create** and complete the application creation process.
+5. Click **Create** to complete the application creation process.
 
 For more details, see the Eclipse IDE for ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*.
 
@@ -61,71 +63,114 @@ For more details, see the Eclipse IDE for ModusToolbox User Guide: *{ModusToolbo
 
 1. Download and unzip this repository onto your local machine, or clone the repository.
 
-2. Open a CLI terminal and navigate to the application folder. On Linux and macOS, you can use any terminal application. On Windows, navigate to the modus-shell directory (*{ModusToolbox install directory}/tools_\<version>/modus-shell*) and run Cygwin.bat.
+2. Open a CLI terminal and navigate to the application folder.
 
-3. Import required libraries by executing the `make getlibs` command.
+   On Linux and macOS, you can use any terminal application. On Windows, navigate to the modus-shell directory (*{ModusToolbox install directory}/tools_\<version>/modus-shell*) and run *Cygwin.bat*.
+
+3. Import the required libraries by executing the `make getlibs` command.
 
 ### In Third-party IDEs:
 
-1. Follow instructions from the CLI section to download or clone the repository, and import libraries using `make getlibs` command.
+1. Follow the instructions from the [CLI](#in-command-line-interface-cli) section to download or clone the repository, and import the libraries using the `make getlibs` command.
 
 2. Export the application to a supported IDE using the `make <ide>` command.
 
-3. Follow instructions displayed in the terminal to create or import the application as an IDE project.
+3. Follow the instructions displayed in the terminal to create or import the application as an IDE project.
 
-For more details, see *Exporting to IDEs* section of the ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mtb_user_guide.pdf*.
+For more details, see the "Exporting to IDEs" section of the ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mtb_user_guide.pdf*.
 
 ## Operation
 
-1. Connect the board to your PC using the provided USB cable through the USB connector.
+You can configure this example to work in master-only or slave-only or both master and slave SPI modes by configuring the value of the `SPI_MODE` macro in the *interface.h* file. By default, this example is configured to work in master SPI mode. Kits with two SPI ports can be configured to work in both SPI modes: one acting as the master and the other as the slave. 
 
-2. Open a terminal program and select the KitProg3 COM port. Set the serial port parameters to 8N1 and 115200 baud.
+The kits CYW9P62S1-43012EVB-01 and CY8CPROTO-062S3-4343W support only one SPI port on the I/O header. Therefore, you can configure these kits only in either master mode (set `SPI_MODE` to `SPI_MODE_MASTER`) or slave mode (set `SPI_MODE` to `SPI_MODE_SLAVE`). In that case, you need two kits, one acting as the SPI master and the other one acting as the SPI slave, to run this example.
 
-3. Program the board. 
+1. Connect the board to your PC using the provided USB cable through the KitProg3 USB connector.
 
-   ### Using Eclipse IDE for ModusToolbox:
+2. Configure the value of the `SPI_MODE` macro in *interface.h* to `SPI_MODE_BOTH` (only for kits with two SPI ports ). 
 
-   1. Select the application project in the Project Explorer.
+3. Program the board.
 
-   2. In the **Quick Panel**, scroll down, and click **\<Application Name> Program (KitProg3)**.
+   - **Using Eclipse IDE for ModusToolbox:**
 
-   ### Using CLI:
+      1. Select the application project in the Project Explorer.
 
-   1. From the terminal, execute the `make program` command to build and program the application using the default toolchain to the default target. You can specify a target and toolchain manually:
-        ```
-        make program TARGET=<BSP> TOOLCHAIN=<toolchain>
-        ```
-        Example: 
-   
-        ```
-        make program TARGET=CY8CPROTO-062-4343W TOOLCHAIN=GCC_ARM
-        ```
-        **Note**:  Before building the application, ensure that the *deps* folder contains the BSP file (*TARGET_xxx.lib*) corresponding to the TARGET. Execute the `make getlibs` command to fetch the BSP contents before building the application.
+      2. In the **Quick Panel**, scroll down, and click **\<Application Name> Program (KitProg3)**.
+
+   - **Using CLI:**
+
+     From the terminal, execute the `make program` command to build and program the application using the default toolchain to the default target. You can specify a target and toolchain manually:
+      ```
+      make program TARGET=<BSP> TOOLCHAIN=<toolchain>
+      ```
+
+      Example:
+      ```
+      make program TARGET=CY8CPROTO-062-4343W TOOLCHAIN=GCC_ARM
+      ```
+
+      **Note:** Before building the application, ensure that the *deps* folder contains the BSP file (*TARGET_xxx.lib*) corresponding to the TARGET. Execute the `make getlibs` command to fetch the BSP contents before building the application.
 
 4. After programming, the application starts automatically.
 
 5. Observe that the kit user LED blinks at 1 Hz.
 
+## Configuring Kit with One SPI Port in Slave Mode  
+
+The CYW9P62S1-43012EVB-01 and CY8CPROTO-062S3-4343W kits support only one SPI port in the I/O header. By default, the kit is configured to work in master-only mode (ensure that the `SPI_MODE` macro in *interface.h* is configured as  `SPI_MODE_MASTER`). 
+
+Do the following to configure the kit to work in slave-only mode:
+
+1. Run the [Device Configurator](https://www.cypress.com/ModusToolboxDeviceConfig) tool from the Quick panel of the IDE.
+  
+   As the kit has only one available SPI port , by default, the associated SCB is aliased as *mSPI* in the **Peripherals** tab.
+
+2. Rename the SCB to **sSPI** and configure the SCB as shown in Figure 1.
+
+   **Figure 1. Configure Peripherals**
+   ![](images/configure_peripherals.png)
+ 
+
+3. In the **Pins** tab, assign the correct drive mode to SPI pins in the **Drive Mode** drop-down menu as shown in Table 1. 
+
+   **Table 1. Drive Mode for SPI Pins**
+
+   | SPI Pins | Drive Mode                                |
+   | :--------| ------------------------------------------|
+   | MOSI     | Digital High-Z. Input buffer ON           |
+   | MISO     | Strong Drive. Input buffer OFF            |
+   | SCLK     | Digital High-Z. Input buffer ON           |
+   | SS0      | Digital High-Z. Input buffer ON           |
+ 
+
+4. In the **DMA** tab, rename the DMA to **rxDma** and configure the rxDMA as shown in Figure 2.
+
+   **Figure 2. Configure rxDMA**
+   ![](images/configure_rx_dma.png)
+ 
+5. Select **File** > **Save** to save the changes and generate the configuration files.
+
 ## Debugging
 
-You can debug the example to step through the code. In the IDE, use the **\<Application Name> Debug (KitProg3)** configuration in the **Quick Panel**. For more details, see *Program and Debug* section in the Eclipse IDE for ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*.
+You can debug the example to step through the code. In the IDE, use the **\<Application Name> Debug (KitProg3)** configuration in the **Quick Panel**. For more details, see the "Program and Debug" section in the Eclipse IDE for ModusToolbox User Guide: *{ModusToolbox install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*.
 
 ## Design and Implementation
 
 ### Resources and Settings
 
-The Arm® Cortex®-M4 (CM4) MCU controls both the Master and Slave SCBs. Both SCBs are used from the same chip, so that you can test the functionality on a single kit. Master sends a packet to the slave with command to "turn on" or "turn off" the user LED. The packets are sent at an interval of 1 second. DMA is used to transfer command data from the SRAM to the SPI FIFO. Slave receives the packet and controls the LED as per the command.
+The Arm® Cortex®-M4 (CM4) MCU controls both the master and slave SCBs. You can configure this example to operate in both master and slave SPI modes so that you can run this example using a single kit provided that the kit supports two SPI ports on its I/O header. 
 
-[Table 1](#table-1-application-resources) lists the ModusToolbox resources used in this example, and how they are used in the design.
+The master sends a packet to the slave with command to "turn ON" or "turn OFF" the user LED. The packets are sent at an interval of 1 second. DMA is used to transfer the command data from the SRAM to the SPI FIFO at the master side and similarly from the SPI FIFO to the SRAM at the slave side. The slave receives the packet and controls the LED according to the command.
 
-##### Table 1. Application Resources
+**Table 2. Application Resources**
 
 | Resource  |  Alias/Object  |    Purpose     |
-| :-------: | :------------: | :------------: |
+| :------- | :------------ | :------------ |
 | SCB (SPI) |      mSPI      | Master SPI SCB |
 | SCB (SPI) |      sSPI      | Slave SPI SCB  |
 |   GPIO    |     KIT_LED2   | LED indication |
 |    DMA    |     txDma      | Data Transfer  |
+|    DMA    |     rxDma      | Data Transfer  |
 
 ## Related Resources
 
@@ -147,12 +192,12 @@ The Arm® Cortex®-M4 (CM4) MCU controls both the Master and Slave SCBs. Both SC
 | **Libraries**                                                 |                                                              |
 | PSoC 6 Peripheral Driver Library (PDL) and docs                    | [psoc6pdl](https://github.com/cypresssemiconductorco/psoc6pdl) on GitHub |
 | Cypress Hardware Abstraction Layer (HAL) Library and docs          | [psoc6hal](https://github.com/cypresssemiconductorco/psoc6hal) on GitHub |
-| RetargetIO - A utility library to retarget the standard input/output (STDIO) messages to a UART port | [retarget-io](https://github.com/cypresssemiconductorco/retarget-io) on GitHub |
+| Retarget I/O - A utility library to retarget the standard input/output (STDIO) messages to a UART port | [retarget-io](https://github.com/cypresssemiconductorco/retarget-io) on GitHub |
 | **Middleware**                                               |                                                              |
-| CapSense library and docs                                    | [capsense](https://github.com/cypresssemiconductorco/capsense) on GitHub |
+| CapSense® library and docs                                    | [capsense](https://github.com/cypresssemiconductorco/capsense) on GitHub |
 | Links to all PSoC 6 MCU Middleware                           | [psoc6-middleware](https://github.com/cypresssemiconductorco/psoc6-middleware) on GitHub |
 | **Tools**                                                    |                                                              |
-| [Eclipse IDE for ModusToolbox](https://www.cypress.com/modustoolbox)     | The multi-platform, Eclipse-based Integrated Development Environment (IDE) that supports application configuration and development for PSoC 6 MCU and IoT designers.             |
+| [Eclipse IDE for ModusToolbox](https://www.cypress.com/modustoolbox)     | The cross-platform, Eclipse-based IDE for IoT designers that supports application configuration and development targeting converged MCU and wireless systems.              |
 | [PSoC Creator](https://www.cypress.com/products/psoc-creator-integrated-design-environment-ide) | The Cypress IDE for PSoC and FM0+ MCU development.            |
 
 ## Other Resources
@@ -163,19 +208,20 @@ For PSoC 6 MCU devices, see [How to Design with PSoC 6 MCU - KBA223067](https://
 
 ## Document History
 
-Document Title: CE221120 - PSoC 6 MCU: SCB SPI Master with DMA
+Document Title: *CE221120* - *PSoC 6 MCU: SCB SPI Master with DMA*
 
 | Version | Description of Change |
 | ------- | --------------------- |
 | 1.0.0   | New code example      |
 | 1.1.0   | Re-structured custom TARGET folders |
 | 1.2.0   | Updated to support ModusToolbox software v2.1 |
+| 1.3.0   | Added support for CY8CPROTO-062S3-4343W and CYW9P62S1-43012EVB-01 kits |
 
 ------
 
 All other trademarks or registered trademarks referenced herein are the property of their respective owners.
 
-![Banner](images/Banner.png)
+![banner](images/ifx-cy-banner.png)
 
 -------------------------------------------------------------------------------
 

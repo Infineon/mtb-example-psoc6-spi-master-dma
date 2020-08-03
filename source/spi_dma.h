@@ -1,8 +1,7 @@
 /******************************************************************************
-* File Name: Interface.h
+* File Name: spi_dma.h
 *
-* Description: This file contains all the macros used by the source files in this
-*               application.
+* Description: This file contains function prototypes for DMA operation.
 *
 *******************************************************************************
 * (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
@@ -35,29 +34,31 @@
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
-#ifndef SOURCE_INTERFACE_H_
-#define SOURCE_INTERFACE_H_
+
+#ifndef SOURCE_SPI_DMA_H_
+#define SOURCE_SPI_DMA_H_
 
 #include "cy_pdl.h"
 #include "cycfg.h"
 
-/* Initialization status */
-#define INIT_SUCCESS            (0)
-#define INIT_FAILURE            (1)
 
-/* Communication status */
-#define TRANSFER_COMPLETE       (0)
-#define TRANSFER_FAILURE        (1)
-#define TRANSFER_IN_PROGRESS    (2)
-#define IDLE                    (3)
+/******************************************************************************
+ * Function Prototypes                                                        *
+ ******************************************************************************/
 
-/* TX Packet Head and Tail */
-#define PACKET_SOP              (0x01UL)
-#define PACKET_EOP              (0x17UL)
+uint32_t configure_tx_dma(uint32_t* txBuffer);
+void tx_dma_complete(void);
+uint32_t configure_rx_dma(uint32_t* rxBuffer);
+void rx_dma_complete(void);
+void handle_error(void);
 
-/* Element index in the packet */
-#define PACKET_SOP_POS          (0UL)
-#define PACKET_CMD_POS          (1UL)
-#define PACKET_EOP_POS          (2UL)
 
-#endif
+/******************************************************************************
+ * Extern Variables                                                           *
+ ******************************************************************************/
+
+extern volatile bool tx_dma_done;
+extern volatile bool rx_dma_done;
+
+
+#endif /* SOURCE_SPI_DMA_H_ */

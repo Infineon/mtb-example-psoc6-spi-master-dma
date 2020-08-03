@@ -38,21 +38,25 @@
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
+
 #include "cy_pdl.h"
 #include "cycfg.h"
-#include "Interface.h"
-#include "SpiDma.h"
-#include "SPIMaster.h"
-#include "SPISlave.h"
+#include "interface.h"
+#include "spi_dma.h"
+#include "spi_master.h"
+#include "spi_slave.h"
 
-/***************************** Macros ****************************************/
+
+/******************************************************************************
+ * Macro definitions                                                          *
+ ******************************************************************************/
 
 /* LED States. LEDs in the supported kits are in active low connection. */
 #define LED_ON              (0)
 #define LED_OFF             (1)
 
 /* Delay between successive SPI Master command transmissions */
-#define CMD_DELAY           (1000)  //in milliseconds
+#define CMD_DELAY_MS        (1000)  //in milliseconds
 
 /* Number of elements in the transmit and receive buffer */
 /* There are three elements - one for head, one for command and one for tail */
@@ -61,15 +65,15 @@
 #define SIZE_OF_PACKET      (NUMBER_OF_ELEMENTS * SIZE_OF_ELEMENT)
 
 
-/************************ Function Prototypes ********************************/
+/******************************************************************************
+ * Function Prototypes                                                        *
+ ******************************************************************************/
 
 /* Function to turn ON or OFF the LED based on the SPI Master command. */
 void update_led(uint32);
 
 /* Function to handle the error */
 void handle_error(void);
-
-/******************************************************************************/
 
 
 /******************************************************************************
@@ -91,33 +95,24 @@ void handle_error(void);
 ******************************************************************************/
 int main(void)
 {
-    /* Buffer to hold command packet to be sent to the slave by the master */
-    uint32  tx_buffer[NUMBER_OF_ELEMENTS];
-
-    /* Buffer to save the received data by the slave */
-    uint32  rx_buffer[NUMBER_OF_ELEMENTS];
-
-    /* Local command variable */
-    uint32 cmd = LED_OFF;
-
     uint32 status = 0;
 
     /* Set up internal routing, pins, and clock-to-peripheral connections */
     init_cycfg_all();
 
-    /* Initialize the SPI Slave */
-    status = init_slave();
 
-    if (status == INIT_FAILURE)
-    {
-        /* NOTE: This function will block the CPU forever */
-        handle_error();
-    }
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
+
+    /* Buffer to hold command packet to be sent to the slave by the master */
+    uint32  tx_buffer[NUMBER_OF_ELEMENTS];
+
+    /* Local command variable */
+    uint32 cmd = LED_OFF;
 
     /* Initialize the SPI Master */
     status = init_master();
 
-    if (status == INIT_FAILURE)
+    if (INIT_FAILURE == status)
     {
         /* NOTE: This function will block the CPU forever */
         handle_error();
@@ -125,17 +120,48 @@ int main(void)
 
     status = configure_tx_dma(tx_buffer);
 
-    if (status == INIT_FAILURE)
+    if (INIT_FAILURE == status)
     {
         /* NOTE: This function will block the CPU forever */
         handle_error();
     }
+
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER)) */
+
+
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
+
+    /* Buffer to save the received data by the slave */
+    uint32  rx_buffer[NUMBER_OF_ELEMENTS];
+
+    /* Initialize the SPI Slave */
+    status = init_slave();
+
+    if (INIT_FAILURE == status)
+    {
+        /* NOTE: This function will block the CPU forever */
+        handle_error();
+    }
+
+    status = configure_rx_dma(rx_buffer);
+
+    if (INIT_FAILURE == status)
+    {
+        /* NOTE: This function will block the CPU forever */
+        handle_error();
+    }
+
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE)) */
+
 
     /* Enable global interrupt */
     __enable_irq();
  
     for (;;)
     {
+
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
+
         /* Toggle the current LED state */
         cmd = (cmd == LED_ON) ? LED_OFF : LED_ON;
 
@@ -147,41 +173,51 @@ int main(void)
         /* Pass the command packet to the master along with the number of bytes to be
          * sent to the slave.*/
         send_packet();
-        status = check_tranfer_status();
 
-        /* Check whether the master succeeded in transferring data */
-        if (status == TRANSFER_COMPLETE)
-        {
+        /* Wait until master complete the transfer */
+        while (false == tx_dma_done) {}
+        tx_dma_done = false;
+
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER)) */
+
+
             /* The below code is for slave function. It is implemented in this same code
              * example so that the master function can be tested without the need of one
-             * more kit. */
+             * more kit, for kits with 2XSPI ports available. */
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
 
-            /* Get the bytes received by the slave */
-            status = read_packet(rx_buffer, SIZE_OF_PACKET);
-
-            /* Check whether the slave succeeded in receiving the required number of bytes
-             * and in the right format */
-            if (status == TRANSFER_COMPLETE)
+        if(rx_dma_done)
+        {
+            /* Check start and end of packet markers */
+            if ((rx_buffer[PACKET_SOP_POS] == PACKET_SOP) && (rx_buffer[PACKET_EOP_POS] == PACKET_EOP))
             {
                 /* Communication succeeded. Update the LED. */
                 update_led(rx_buffer[PACKET_CMD_POS]);
             }
             else
             {
-                /* Communication failed */
+                /* Data was not received correctly and hence Communication failed */
                 handle_error();
             }
-        }
-        else
-        {
-            /* Communication failed */
-            handle_error();
+
+            rx_dma_done = false;
+            /* Get the bytes received by the slave */
+            receive_packet();
         }
 
+
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE)) */
+
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
+
         /* Give delay before initiating the next command */
-        Cy_SysLib_Delay(CMD_DELAY);
+        Cy_SysLib_Delay(CMD_DELAY_MS);
+
+#endif
+
     }
 }
+
 
 /******************************************************************************
 * Function Name: update_led
@@ -199,19 +235,20 @@ void update_led(uint32 LED_Cmd)
 {
     /* Control the LED. Note that the LED on the supported kits is in active low
        connection. */
-
-    if (LED_Cmd == LED_ON)
+    if (LED_ON == LED_Cmd)
     {
         /* Turn ON the LED */
         Cy_GPIO_Clr(KIT_LED2_PORT, KIT_LED2_NUM);
     }
 
-    if (LED_Cmd == LED_OFF)
+    if (LED_OFF == LED_Cmd)
     {
         /* Turn OFF the LED */
         Cy_GPIO_Set(KIT_LED2_PORT, KIT_LED2_NUM);
     }
+
 }
+
 
 /******************************************************************************
 * Function Name: handle_error
@@ -234,6 +271,5 @@ void handle_error(void)
 
     /* Infinite loop. */
     while(1u) {}
+
 }
-
-

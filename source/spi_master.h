@@ -1,5 +1,5 @@
 /******************************************************************************
-* File Name: SPIMaster.h
+* File Name: spi_master.h
 *
 * Description: This file contains all the function prototypes required for
 *               SPI Master implemented using Serial Communication Block (SCB)
@@ -35,24 +35,27 @@
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
-#ifndef SOURCE_SPIMASTER_H_
-#define SOURCE_SPIMASTER_H_
+
+#ifndef SOURCE_SPI_MASTER_H_
+#define SOURCE_SPI_MASTER_H_
 
 #include "cy_pdl.h"
 #include "cycfg.h"
 
+
 /***************************************
 *                Macros
 ****************************************/
+
 #define MASTER_ERROR_MASK  (CY_SCB_SPI_SLAVE_TRANSFER_ERR  | CY_SCB_SPI_TRANSFER_OVERFLOW    | \
                             CY_SCB_SPI_TRANSFER_UNDERFLOW)
+
 
 /***************************************
 *         Function Prototypes
 ****************************************/
 uint32 init_master(void);
 void send_packet(void);
-uint32 check_tranfer_status(void);
 
 
-#endif /* SOURCE_SPIMASTER_H_ */
+#endif /* SOURCE_SPI_MASTER_H_ */

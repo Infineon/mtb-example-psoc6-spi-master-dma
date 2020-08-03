@@ -1,8 +1,7 @@
 /******************************************************************************
-* File Name: SPISlave.h
+* File Name: spi_master.c
 *
-* Description: This file contains all the function prototypes required for
-*               SPI Slave implemented using Serial Communication Block (SCB)
+* Description:  This file contains function definitions for SPI Master.
 *
 *******************************************************************************
 * (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
@@ -35,16 +34,68 @@
 * system or application assumes all risk of such use and in doing so agrees to
 * indemnify Cypress against all liability.
 *******************************************************************************/
-#ifndef SOURCE_SPISLAVE_H_
-#define SOURCE_SPISLAVE_H_
 
-#include "cy_pdl.h"
-#include "cycfg.h"
+#include "spi_master.h"
+#include "interface.h"
+#include "spi_dma.h"
 
-/***************************************
-*         Function Prototypes
-****************************************/
-uint32 init_slave(void);
-uint32 read_packet(uint32 *, uint32_t);
 
-#endif /* SOURCE_SPISLAVE_H_ */
+#if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
+
+/******************************************************************************
+* Function Name: init_master
+*******************************************************************************
+*
+* Summary:      This function initializes the SPI Master based on the
+*               configuration done in design.modus file.
+*
+* Parameters:   None
+*
+* Return:       (uint32) INIT_SUCCESS or INIT_FAILURE
+*
+******************************************************************************/
+uint32 init_master(void)
+{
+    cy_en_scb_spi_status_t init_status;
+
+    /* Configure SPI block */
+    init_status = Cy_SCB_SPI_Init(mSPI_HW, &mSPI_config, NULL);
+
+    /* If the initialization fails, return failure status */
+    if (init_status != CY_SCB_SPI_SUCCESS)
+    {
+        return(INIT_FAILURE);
+    }
+
+    /* Set active slave select to line 0 */
+    Cy_SCB_SPI_SetActiveSlaveSelect(mSPI_HW, CY_SCB_SPI_SLAVE_SELECT0);
+
+    /* Enable SPI master block. */
+    Cy_SCB_SPI_Enable(mSPI_HW);
+
+    /* Initialization completed */
+    return(INIT_SUCCESS);
+}
+
+
+/******************************************************************************
+* Function Name: send_packet
+*******************************************************************************
+*
+* Summary:      This function transfers data from txBuffer to mSPI TX-FIFO. The  
+*               below function enables channel and DMA block to start descriptor 
+*               execution process for txDMA.
+*
+* Parameters:   None
+*
+* Return:       None
+*
+******************************************************************************/
+void send_packet(void)
+{
+    /* Enable DMA channel to transfer 12 bytes of data from txBuffer into mSPI TX-FIFO */
+    Cy_DMA_Channel_Enable(txDma_HW, txDma_CHANNEL);
+}
+
+
+#endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER)) */
