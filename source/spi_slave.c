@@ -52,10 +52,10 @@
 *
 * Parameters:   None
 *
-* Return:       (uint32) INIT_SUCCESS or INIT_FAILURE
+* Return:       (uint32_t) INIT_SUCCESS or INIT_FAILURE
 *
 ******************************************************************************/
-uint32 init_slave(void)
+uint32_t init_slave(void)
 {
     cy_stc_scb_spi_context_t sSPI_context;
     cy_en_scb_spi_status_t init_status;

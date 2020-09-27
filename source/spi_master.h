@@ -54,7 +54,7 @@
 /***************************************
 *         Function Prototypes
 ****************************************/
-uint32 init_master(void);
+uint32_t init_master(void);
 void send_packet(void);
 
 

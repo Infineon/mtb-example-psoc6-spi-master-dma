@@ -47,7 +47,7 @@
 *         Function Prototypes
 ****************************************/
 
-uint32 init_slave(void);
+uint32_t init_slave(void);
 void receive_packet(void);
 
 

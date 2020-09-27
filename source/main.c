@@ -70,7 +70,7 @@
  ******************************************************************************/
 
 /* Function to turn ON or OFF the LED based on the SPI Master command. */
-void update_led(uint32);
+void update_led(uint32_t);
 
 /* Function to handle the error */
 void handle_error(void);
@@ -95,7 +95,7 @@ void handle_error(void);
 ******************************************************************************/
 int main(void)
 {
-    uint32 status = 0;
+    uint32_t status = 0;
 
     /* Set up internal routing, pins, and clock-to-peripheral connections */
     init_cycfg_all();
@@ -104,10 +104,10 @@ int main(void)
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
 
     /* Buffer to hold command packet to be sent to the slave by the master */
-    uint32  tx_buffer[NUMBER_OF_ELEMENTS];
+    uint32_t  tx_buffer[NUMBER_OF_ELEMENTS];
 
     /* Local command variable */
-    uint32 cmd = LED_OFF;
+    uint32_t cmd = LED_OFF;
 
     /* Initialize the SPI Master */
     status = init_master();
@@ -132,7 +132,7 @@ int main(void)
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
 
     /* Buffer to save the received data by the slave */
-    uint32  rx_buffer[NUMBER_OF_ELEMENTS];
+    uint32_t  rx_buffer[NUMBER_OF_ELEMENTS];
 
     /* Initialize the SPI Slave */
     status = init_slave();
@@ -205,14 +205,12 @@ int main(void)
             receive_packet();
         }
 
-
 #endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE)) */
 
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
 
         /* Give delay before initiating the next command */
         Cy_SysLib_Delay(CMD_DELAY_MS);
-
 #endif
 
     }
@@ -226,27 +224,25 @@ int main(void)
 * Summary:      This function updates the LED based on the command received by
 *               the SPI Slave from Master.
 *
-* Parameters:   (uint32) LED_Cmd - command to turn LED ON or OFF
+* Parameters:   (uint32_t) LED_Cmd - command to turn LED ON or OFF
 *
 * Return:       None
 *
 ******************************************************************************/
-void update_led(uint32 LED_Cmd)
+void update_led(uint32_t LED_Cmd)
 {
     /* Control the LED. Note that the LED on the supported kits is in active low
        connection. */
     if (LED_ON == LED_Cmd)
     {
         /* Turn ON the LED */
-        Cy_GPIO_Clr(KIT_LED2_PORT, KIT_LED2_NUM);
+        Cy_GPIO_Clr(CYBSP_USER_LED_PORT, CYBSP_USER_LED_NUM);
     }
-
     if (LED_OFF == LED_Cmd)
     {
         /* Turn OFF the LED */
-        Cy_GPIO_Set(KIT_LED2_PORT, KIT_LED2_NUM);
+        Cy_GPIO_Set(CYBSP_USER_LED_PORT, CYBSP_USER_LED_NUM);
     }
-
 }
 
 
@@ -273,3 +269,4 @@ void handle_error(void)
     while(1u) {}
 
 }
+/* [] END OF FILE */
