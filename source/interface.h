@@ -1,26 +1,30 @@
 /******************************************************************************
-* File Name: interface.h
+* File Name:   interface.h
 *
 * Description: This file contains all the macros used by the source files in this
 *               application.
 *
-*******************************************************************************
-* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
-*******************************************************************************
-* This software, including source code, documentation and related materials
-* ("Software"), is owned by Cypress Semiconductor Corporation or one of its
-* subsidiaries ("Cypress") and is protected by and subject to worldwide patent
-* protection (United States and foreign), United States copyright laws and
-* international treaty provisions. Therefore, you may use this Software only
-* as provided in the license agreement accompanying the software package from
-* which you obtained this Software ("EULA").
+* Related Document: See README.md
 *
+*
+*******************************************************************************
+* Copyright 2019-2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
+*
+* This software, including source code, documentation and related
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
+* worldwide patent protection (United States and foreign),
+* United States copyright laws and international treaty provisions.
+* Therefore, you may use this Software only as provided in the license
+* agreement accompanying the software package from which you
+* obtained this Software ("EULA").
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
-* non-transferable license to copy, modify, and compile the Software source
-* code solely for use in connection with Cypress's integrated circuit products.
-* Any reproduction, modification, translation, compilation, or representation
-* of this Software except as specified above is prohibited without the express
-* written permission of Cypress.
+* non-transferable license to copy, modify, and compile the Software
+* source code solely for use in connection with Cypress's
+* integrated circuit products.  Any reproduction, modification, translation,
+* compilation, or representation of this Software except as specified
+* above is prohibited without the express written permission of Cypress.
 *
 * Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
@@ -31,9 +35,9 @@
 * not authorize its products for use in any products where a malfunction or
 * failure of the Cypress product may reasonably be expected to result in
 * significant property damage, injury or death ("High Risk Product"). By
-* including Cypress's product in a High Risk Product, the manufacturer of such
-* system or application assumes all risk of such use and in doing so agrees to
-* indemnify Cypress against all liability.
+* including Cypress's product in a High Risk Product, the manufacturer
+* of such system or application assumes all risk of such use and in doing
+* so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
 
 #ifndef SOURCE_INTERFACE_H_
@@ -57,7 +61,8 @@
 
 
 #if (SPI_MODE == SPI_MODE_BOTH)
-    #if defined (TARGET_CYW9P62S1_43012EVB_01) || defined (TARGET_CY8CPROTO_062S3_4343W)
+    #if defined (TARGET_CYW9P62S1_43012EVB_01) || defined (TARGET_CY8CPROTO_062S3_4343W) || \
+    defined (TARGET_CY8CKIT_062S4)
         #warning For the current TARGET, this example requires the SPI_MODE macro to be \
                  configured either in SPI_MODE_MASTER or SPI_MODE_SLAVE, not in SPI_MODE_BOTH.
     #endif
