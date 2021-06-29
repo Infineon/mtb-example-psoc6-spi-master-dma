@@ -2,7 +2,7 @@
 
 This example demonstrates the use of the SPI Serial Communication Block (SCB)) resource for PSoC® 6 MCU in master mode using DMA. The SPI master is configured to send command packets to control a user LED on the slave. Both the master and slave can be on the same device or on different devices.
 
-[Provide feedback on this Code Example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMjExMjAiLCJTcGVjIE51bWJlciI6IjAwMi0yMTEyMCIsIkRvYyBUaXRsZSI6IlBTb0MgNiBNQ1U6IFNDQiBTUEkgTWFzdGVyIHdpdGggRE1BIiwicmlkIjoic2RhayIsIkRvYyB2ZXJzaW9uIjoiMi4xLjAiLCJEb2MgTGFuZ3VhZ2UiOiJFbmdsaXNoIiwiRG9jIERpdmlzaW9uIjoiTUNEIiwiRG9jIEJVIjoiSUNXIiwiRG9jIEZhbWlseSI6IlBTT0MifQ==)
+[Provide feedback on this Code Example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMjExMjAiLCJTcGVjIE51bWJlciI6IjAwMi0yMTEyMCIsIkRvYyBUaXRsZSI6IlBTb0MgNiBNQ1U6IFNDQiBTUEkgTWFzdGVyIHdpdGggRE1BIiwicmlkIjoic2RhayIsIkRvYyB2ZXJzaW9uIjoiMi4yLjAiLCJEb2MgTGFuZ3VhZ2UiOiJFbmdsaXNoIiwiRG9jIERpdmlzaW9uIjoiTUNEIiwiRG9jIEJVIjoiSUNXIiwiRG9jIEZhbWlseSI6IlBTT0MifQ==)
 
 ## Requirements
 
@@ -265,6 +265,7 @@ Document Title: *CE221120* - *PSoC 6 MCU: SCB SPI Master with DMA*
 | 1.3.0   | Added support for CY8CPROTO-062S3-4343W and CYW9P62S1-43012EVB-01 kits. |
 | 2.0.0   | Major update to support ModusToolbox software v2.2; added support for new kits.<br /> This version is not backward compatible with ModusToolbox software v2.1.  |
 | 2.1.0   | Added support for new kits |
+| 2.2.0   | Updating custom design for target CYSBSYSKIT-01, to add support for wireless device |
 
 ------
 
