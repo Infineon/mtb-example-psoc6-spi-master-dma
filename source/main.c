@@ -9,7 +9,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2019-2021, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -72,7 +72,6 @@ void update_led(uint32_t);
 
 /* Function to handle the error */
 void handle_error(void);
-
 
 /******************************************************************************
 * Function Name: main
@@ -213,7 +212,6 @@ int main(void)
 
     }
 }
-
 
 /******************************************************************************
 * Function Name: update_led
