@@ -9,7 +9,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2019-2021, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -42,20 +42,18 @@
 *******************************************************************************/
 
 #include "cy_pdl.h"
+#include "cyhal.h"
+#include "cyhal_gpio_impl.h"
 #include "cycfg.h"
 #include "interface.h"
 #include "spi_dma.h"
 #include "spi_master.h"
 #include "spi_slave.h"
-
+#include "cybsp_types.h"
 
 /******************************************************************************
  * Macro definitions                                                          *
  ******************************************************************************/
-
-/* LED States. LEDs in the supported kits are in active low connection. */
-#define LED_ON              (0)
-#define LED_OFF             (1)
 
 /* Delay between successive SPI Master command transmissions */
 #define CMD_DELAY_MS        (1000)  //in milliseconds
@@ -64,8 +62,6 @@
 /* There are three elements - one for head, one for command and one for tail */
 #define NUMBER_OF_ELEMENTS  (3UL)
 #define SIZE_OF_ELEMENT     (4UL)
-#define SIZE_OF_PACKET      (NUMBER_OF_ELEMENTS * SIZE_OF_ELEMENT)
-
 
 /******************************************************************************
  * Function Prototypes                                                        *
@@ -76,7 +72,6 @@ void update_led(uint32_t);
 
 /* Function to handle the error */
 void handle_error(void);
-
 
 /******************************************************************************
 * Function Name: main
@@ -109,7 +104,7 @@ int main(void)
     uint32_t  tx_buffer[NUMBER_OF_ELEMENTS];
 
     /* Local command variable */
-    uint32_t cmd = LED_OFF;
+    uint32_t cmd = CYBSP_LED_STATE_OFF;
 
     /* Initialize the SPI Master */
     status = init_master();
@@ -165,7 +160,7 @@ int main(void)
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
 
         /* Toggle the current LED state */
-        cmd = (cmd == LED_ON) ? LED_OFF : LED_ON;
+        cmd = (cmd == CYBSP_LED_STATE_ON) ? CYBSP_LED_STATE_OFF : CYBSP_LED_STATE_ON;
 
         /* Form the command packet */
         tx_buffer[PACKET_SOP_POS] = PACKET_SOP;
@@ -212,12 +207,11 @@ int main(void)
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
 
         /* Give delay before initiating the next command */
-        Cy_SysLib_Delay(CMD_DELAY_MS);
+        cyhal_system_delay_ms(CMD_DELAY_MS);
 #endif
 
     }
 }
-
 
 /******************************************************************************
 * Function Name: update_led
@@ -226,27 +220,26 @@ int main(void)
 * Summary:      This function updates the LED based on the command received by
 *               the SPI Slave from Master.
 *
-* Parameters:   (uint32_t) LED_Cmd - command to turn LED ON or OFF
+* Parameters:   (uint32_t) led_cmd - command to turn LED ON or OFF
 *
 * Return:       None
 *
 ******************************************************************************/
-void update_led(uint32_t LED_Cmd)
+void update_led(uint32_t led_cmd)
 {
     /* Control the LED. Note that the LED on the supported kits is in active low
        connection. */
-    if (LED_ON == LED_Cmd)
+    if (CYBSP_LED_STATE_ON == led_cmd)
     {
         /* Turn ON the LED */
-        Cy_GPIO_Clr(CYBSP_USER_LED_PORT, CYBSP_USER_LED_NUM);
+        cyhal_gpio_write(CYBSP_USER_LED, CYBSP_LED_STATE_ON);
     }
-    if (LED_OFF == LED_Cmd)
+    if (CYBSP_LED_STATE_OFF == led_cmd)
     {
         /* Turn OFF the LED */
-        Cy_GPIO_Set(CYBSP_USER_LED_PORT, CYBSP_USER_LED_NUM);
+        cyhal_gpio_write(CYBSP_USER_LED, CYBSP_LED_STATE_OFF);
     }
 }
-
 
 /******************************************************************************
 * Function Name: handle_error

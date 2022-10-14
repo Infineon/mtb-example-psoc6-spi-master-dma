@@ -7,7 +7,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2019-2021, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -39,8 +39,15 @@
 * so agrees to indemnify Cypress against all liability.
 *******************************************************************************/
 
+#include "cyhal.h"
 #include "spi_dma.h"
 #include "interface.h"
+
+/*******************************************************************************
+ *                       Macro definitions
+ ******************************************************************************/
+#define RXDMA_INTERRUPT_PRIORITY (7u)
+#define TXDMA_INTERRUPT_PRIORITY (7u)
 
 
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
@@ -81,7 +88,7 @@ uint32_t configure_tx_dma(uint32_t* tx_buffer)
      Cy_DMA_Descriptor_SetDstAddress(&txDma_Descriptor_0, (void *)&mSPI_HW->TX_FIFO_WR);
 
       /* Initialize and enable the interrupt from TxDma */
-     Cy_SysInt_Init(&intTxDma_cfg, &tx_dma_complete);
+     cyhal_system_set_isr(txDma_IRQ, txDma_IRQ, TXDMA_INTERRUPT_PRIORITY, &tx_dma_complete);
      NVIC_EnableIRQ((IRQn_Type)intTxDma_cfg.intrSrc);
 
       /* Enable DMA interrupt source. */
@@ -138,7 +145,7 @@ uint32_t configure_rx_dma(uint32_t* rx_buffer)
      Cy_DMA_Descriptor_SetDstAddress(&rxDma_Descriptor_0, (uint8_t *)rx_buffer);
 
       /* Initialize and enable the interrupt from TxDma */
-     Cy_SysInt_Init(&intRxDma_cfg, &rx_dma_complete);
+     cyhal_system_set_isr(rxDma_IRQ, rxDma_IRQ, RXDMA_INTERRUPT_PRIORITY, &rx_dma_complete);
      NVIC_EnableIRQ((IRQn_Type)intRxDma_cfg.intrSrc);
 
       /* Enable DMA interrupt source. */
