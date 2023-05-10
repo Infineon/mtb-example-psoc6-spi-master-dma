@@ -7,7 +7,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -48,7 +48,7 @@
 
 /******************************************************************************
  * Function Prototypes                                                        *
- ******************************************************************************/
+******************************************************************************/
 
 uint32_t configure_tx_dma(uint32_t* txBuffer);
 void tx_dma_complete(void);
@@ -59,7 +59,7 @@ void handle_error(void);
 
 /******************************************************************************
  * Extern Variables                                                           *
- ******************************************************************************/
+******************************************************************************/
 
 extern volatile bool tx_dma_done;
 extern volatile bool rx_dma_done;

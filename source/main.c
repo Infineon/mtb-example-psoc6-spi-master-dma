@@ -1,6 +1,7 @@
 /******************************************************************************
 * File Name:   main.c
 *
+* 
 * Description: This example project demonstrates SPI communication between two
 * SCB blocks of PSoC 6 device (one configured as Master and another as slave).
 * Polling method is used on the master side to confirm data transfer completion.
@@ -9,7 +10,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -262,6 +263,7 @@ void handle_error(void)
 
     /* Infinite loop. */
     while(1u) {}
-
 }
+
+
 /* [] END OF FILE */

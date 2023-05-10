@@ -7,7 +7,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -46,24 +46,39 @@
 /*******************************************************************************
  *                       Macro definitions
  ******************************************************************************/
+
+/* Interrupt priority for RXDMA */
 #define RXDMA_INTERRUPT_PRIORITY (7u)
+
+/* Interrupt priority for TXDMA */
 #define TXDMA_INTERRUPT_PRIORITY (7u)
 
 
+/* varibale to check the rx dma transection status */
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
 
 volatile bool rx_dma_done = false;
 
 #endif
 
-
+/* varibale to check the tx dma transection status */
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER))
 
 volatile bool tx_dma_done = false;
 
-
+/******************************************************************************
+* Function Name: configure_tx_dma
+*******************************************************************************
+*
+* Summary:      This function configure the transmit DMA block 
+*
+* Parameters:   tx_buffer
+*
+* Return:       (uint32_t) INIT_SUCCESS or INIT_FAILURE
+*
+******************************************************************************/
 uint32_t configure_tx_dma(uint32_t* tx_buffer)
- {
+{
      cy_en_dma_status_t dma_init_status;
      const cy_stc_sysint_t intTxDma_cfg =
      {
@@ -96,11 +111,21 @@ uint32_t configure_tx_dma(uint32_t* tx_buffer)
      /* Enable DMA block to start descriptor execution process */
      Cy_DMA_Enable(txDma_HW);
      return INIT_SUCCESS;
- }
+}
 
-
+/******************************************************************************
+* Function Name: configure_tx_dma
+*******************************************************************************
+*
+* Summary:      This function check the tx DMA status
+*
+* Parameters:   None
+*
+* Return:       None
+*
+******************************************************************************/
 void tx_dma_complete(void)
- {
+{
      /* Check tx DMA status */
      if ((CY_DMA_INTR_CAUSE_COMPLETION    != Cy_DMA_Channel_GetStatus(txDma_HW, txDma_CHANNEL)) &&
          (CY_DMA_INTR_CAUSE_CURR_PTR_NULL != Cy_DMA_Channel_GetStatus(txDma_HW, txDma_CHANNEL)))
@@ -112,15 +137,26 @@ void tx_dma_complete(void)
      tx_dma_done = true;
      /* Clear tx DMA interrupt */
      Cy_DMA_Channel_ClearInterrupt(txDma_HW, txDma_CHANNEL);
- }
+}
 
 #endif /* #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_MASTER)) */
 
 
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
 
+/******************************************************************************
+* Function Name: configure_tx_dma
+*******************************************************************************
+*
+* Summary:      This function configure the receive DMA block 
+*
+* Parameters:   rx_buffer
+*
+* Return:       (uint32_t) INIT_SUCCESS or INIT_FAILURE
+*
+******************************************************************************/
 uint32_t configure_rx_dma(uint32_t* rx_buffer)
- {
+{
      cy_en_dma_status_t dma_init_status;
      const cy_stc_sysint_t intRxDma_cfg =
      {
@@ -154,9 +190,19 @@ uint32_t configure_rx_dma(uint32_t* rx_buffer)
      Cy_DMA_Channel_Enable(rxDma_HW, rxDma_CHANNEL);
      Cy_DMA_Enable(rxDma_HW);
      return INIT_SUCCESS;
- }
+}
 
-
+/******************************************************************************
+* Function Name: configure_tx_dma
+*******************************************************************************
+*
+* Summary:      This function check the rx DMA status
+*
+* Parameters:   None
+*
+* Return:       None
+*
+******************************************************************************/
 void rx_dma_complete(void)
 {
     /* Scenario: Inside the interrupt service routine for block DW0 channel 23: */
