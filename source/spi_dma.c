@@ -114,7 +114,7 @@ uint32_t configure_tx_dma(uint32_t* tx_buffer)
 }
 
 /******************************************************************************
-* Function Name: configure_tx_dma
+* Function Name: tx_dma_complete
 *******************************************************************************
 *
 * Summary:      This function check the tx DMA status
@@ -145,7 +145,7 @@ void tx_dma_complete(void)
 #if ((SPI_MODE == SPI_MODE_BOTH) || (SPI_MODE == SPI_MODE_SLAVE))
 
 /******************************************************************************
-* Function Name: configure_tx_dma
+* Function Name: configure_rx_dma
 *******************************************************************************
 *
 * Summary:      This function configure the receive DMA block 
@@ -193,7 +193,7 @@ uint32_t configure_rx_dma(uint32_t* rx_buffer)
 }
 
 /******************************************************************************
-* Function Name: configure_tx_dma
+* Function Name: rx_dma_complete
 *******************************************************************************
 *
 * Summary:      This function check the rx DMA status

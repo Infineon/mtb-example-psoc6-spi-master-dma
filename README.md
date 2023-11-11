@@ -4,7 +4,7 @@ This example demonstrates the use of the SPI Serial Communication Block (SCB) re
 
 [View this README on GitHub.](https://github.com/Infineon/mtb-example-psoc6-spi-master-dma)
 
-[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzcwMTAiLCJTcGVjIE51bWJlciI6IjAwMi0zNzAxMCIsIkRvYyBUaXRsZSI6IlBTb0MmdHJhZGU7IDYgTUNVOiBTQ0IgU1BJIG1hc3RlciB3aXRoIERNQSIsInJpZCI6InNkYWsiLCJEb2MgdmVyc2lvbiI6IjMuMS4wIiwiRG9jIExhbmd1YWdlIjoiRW5nbGlzaCIsIkRvYyBEaXZpc2lvbiI6Ik1DRCIsIkRvYyBCVSI6IklDVyIsIkRvYyBGYW1pbHkiOiJQU09DIn0=)
+[Provide feedback on this code example.](https://cypress.co1.qualtrics.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyMzcwMTAiLCJTcGVjIE51bWJlciI6IjAwMi0zNzAxMCIsIkRvYyBUaXRsZSI6IlBTb0MmdHJhZGU7IDYgTUNVOiBTQ0IgU1BJIG1hc3RlciB3aXRoIERNQSIsInJpZCI6InNkYWsiLCJEb2MgdmVyc2lvbiI6IjMuMS4xIiwiRG9jIExhbmd1YWdlIjoiRW5nbGlzaCIsIkRvYyBEaXZpc2lvbiI6Ik1DRCIsIkRvYyBCVSI6IklDVyIsIkRvYyBGYW1pbHkiOiJQU09DIn0=)
 
 
 ## Requirements
@@ -294,6 +294,7 @@ Document title: *CE237010* - *PSoC&trade; 6 MCU: SCB SPI master with DMA*
  2.3.0   | Updated to HAL equivalent <br> Added support for CY8CEVAL-062S2, CY8CEVAL-062S2-LAI-4373M2
  3.0.0   | Major update to support ModusToolbox™ v3.0 and BSPs v4.x. This version is not backward compatible with previous versions of ModusToolbox™ software
  3.1.0   | Added support for CY8CEVAL-062S2-MUR-43439M2,CY8CEVAL-062S2-LAI-43439M2,CY8CEVAL-062S2-MUR-4373EM2 kit.<br /> Updated the BSPs v4.x
+ 3.1.1   | Minor corrections in the source comments
 
 <br />
 
